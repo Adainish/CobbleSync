@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "cobblesync",
+  "version": "${version}",
+  "name": "CobbleSync",
+  "description": "Syncs Cobblemon Data, for, well, Cobblemon",
+  "authors": [
+    "Winglet"
+  ],
+  "contact": {
+    "website": "iverium.nl",
+    "repo": "https://github.com/adainish/CobbleSync"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cobblesync/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "client": [
+      "io.github.adainish.cobblesync.client.CobbleSyncClient"
+    ],
+    "main": [
+      "io.github.adainish.cobblesync.CobbleSync"
+    ]
+  },
+  "mixins": [
+    "cobblesync.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
