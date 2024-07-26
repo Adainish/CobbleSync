@@ -13,6 +13,8 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.MinecraftServer;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CobbleSync implements ModInitializer
 {
@@ -26,6 +28,8 @@ public class CobbleSync implements ModInitializer
     public SyncManager syncManager;
 
     public PlayerListener playerListener;
+
+    public static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     public void onInitialize()
@@ -128,5 +132,6 @@ public class CobbleSync implements ModInitializer
         Logger.log("CobbleSync is shutting down...");
         //save all in cache.
        this.syncManager.playerStorage.saveAllPlayers();
+       executor.shutdown();
     }
 }

@@ -48,11 +48,6 @@ public class PlayerStorage
         Arrays.stream(players).forEach(this::savePlayer);
     }
 
-    public void saveAndRemovePlayer(UUID uuid)
-    {
-        storage.saveAndRemove(uuid);
-    }
-
     public void saveAndRemovePlayers(UUID... uuids)
     {
         Arrays.stream(uuids).forEach(storage::saveAndRemove);
@@ -70,6 +65,15 @@ public class PlayerStorage
     public void savePlayer(UUID uuid) {
         if (storage.get(uuid).isPresent()) {
             savePlayer(storage.get(uuid).orElseThrow());
+        } else {
+            Logger.log("Could not save player " + uuid.toString() + " to file, player is null.");
+        }
+    }
+
+    public void saveAndRemovePlayer(UUID uuid)
+    {
+        if (storage.get(uuid).isPresent()) {
+            storage.saveAndRemove(uuid);
         } else {
             Logger.log("Could not save player " + uuid.toString() + " to file, player is null.");
         }

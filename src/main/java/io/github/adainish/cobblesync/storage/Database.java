@@ -6,6 +6,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 
+import io.github.adainish.cobblesync.logging.Logger;
 import io.github.adainish.cobblesync.storage.abstracted.AbstractStorage;
 import io.github.adainish.cobblesync.storage.adapters.MongoCodecStringArray;
 import io.github.adainish.cobblesync.sync.obj.interfaces.Identifiable;
@@ -93,15 +94,17 @@ public class Database<T> extends AbstractStorage<T> {
             if (item instanceof Identifiable identifiable) {
                 String uuid = identifiable.getUuid().toString();
                 Document document = Document.parse(gson.toJson(item));
-                getCollection().replaceOne(Filters.eq("uuid", uuid), document, new ReplaceOptions().upsert(true));
+                Logger.log("Saving " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
+                if ( getCollection().replaceOne(Filters.eq("uuid", uuid), document, new ReplaceOptions().upsert(true)).wasAcknowledged())
+                    Logger.log("Successfully saved " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
             }
         });
     }
 
     @Override
     public void saveAndRemove(UUID uuid) {
-        save(get(uuid).orElseThrow());
         this.cachedUUIDMappedData.remove(uuid);
+        save(get(uuid).orElseThrow());
     }
 
     @Override
