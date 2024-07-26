@@ -24,7 +24,7 @@ public class GSON
                 .registerTypeAdapter(CompoundTag.class, new CompoundNBTAdapter())
                 .registerTypeAdapter(ResourceLocation.class, IdentifierAdapter.INSTANCE)
                 .registerTypeAdapter(PlayerDataExtension.class, PlayerDataExtensionAdapter.INSTANCE)
-                .excludeFieldsWithModifiers(Modifier.TRANSIENT)
+                .excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC, Modifier.FINAL)
                 .create();
     }
 }

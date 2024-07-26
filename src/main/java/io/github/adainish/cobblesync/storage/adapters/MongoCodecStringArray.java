@@ -6,9 +6,11 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
+import java.util.Arrays;
+
 public class MongoCodecStringArray implements Codec {
 
-    public void encode(BsonWriter writer, String[] value, EncoderContext encoderContext) {
+    public void encode(BsonWriter writer, String[] value) {
         if (writer == null)
             return;
 
@@ -18,22 +20,20 @@ public class MongoCodecStringArray implements Codec {
         if (isNonNull) {
             writer.writeInt32(value.length);
 
-            for (int i = 0; i < value.length; ++i) {
-                writer.writeString(value[i]);
-            }
+            Arrays.stream(value).forEach(writer::writeString);
         }
         writer.writeEndArray();
     }
 
     public void encode(BsonWriter var1, Object var2, EncoderContext var3) {
-        this.encode(var1, (String[]) var2, var3);
+        this.encode(var1, (String[]) var2);
     }
 
     public Class getEncoderClass() {
         return String[].class;
     }
 
-    public String[] decodeImpl(BsonReader reader, DecoderContext decoderContext) {
+    public String[] decodeImpl(BsonReader reader) {
         if (reader == null)
             return null;
 
@@ -43,9 +43,7 @@ public class MongoCodecStringArray implements Codec {
         if (isNonNull) {
             int size = reader.readInt32();
             ret = new String[size];
-            for (int i = 0; i < size; ++i) {
-                ret[i] = reader.readString();
-            }
+            for (int i = 0; i < size; ++i) ret[i] = reader.readString();
         }
         reader.readEndArray();
 
@@ -53,6 +51,6 @@ public class MongoCodecStringArray implements Codec {
     }
 
     public Object decode(BsonReader var1, DecoderContext var2) {
-        return decodeImpl(var1, var2);
+        return decodeImpl(var1);
     }
 }

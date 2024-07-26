@@ -17,6 +17,7 @@ public class CobblePlayer extends AbstractPlayer implements Identifiable
     public PlayerData playerData;
     public CompoundTag pcStore;
     public CompoundTag partyStore;
+    public PlayerInventory playerInventory;
     public CobblePlayer(UUID uuid)
     {
         super(uuid);
@@ -59,9 +60,21 @@ public class CobblePlayer extends AbstractPlayer implements Identifiable
             if (this.playerData == null) {
                 this.playerData = Cobblemon.playerData.get(player);
             } else {
-                Cobblemon.playerData.saveSingle(this.playerData);
+                PlayerData data = Cobblemon.playerData.get(player);
+                data.setAdvancementData(this.playerData.getAdvancementData());
+                data.setBattleTheme(this.playerData.getBattleTheme());
+                data.setKeyItems(this.playerData.getKeyItems());
+                data.setStarterLocked(this.playerData.getStarterLocked());
+                data.setStarterPrompted(this.playerData.getStarterPrompted());
+                data.setStarterUUID(this.playerData.getStarterUUID());
+                data.setStarterSelected(this.playerData.getStarterSelected());
                 //send update to playerdata?
                 Cobblemon.playerData.get(player).sendToPlayer(player);
+            }
+            if (this.playerInventory == null) {
+                this.playerInventory = new PlayerInventory().fromPlayer(player);
+            } else {
+                this.playerInventory.toPlayer(player);
             }
         } catch (Exception e) {
             Logger.log(e);
@@ -76,11 +89,21 @@ public class CobblePlayer extends AbstractPlayer implements Identifiable
                 CobbleSync.instance.server.getPlayerList().getPlayer(this.uuid).disconnect();
                 return;
             }
-            if (this.playerData == null) {
-                this.playerData = Cobblemon.playerData.get(player);
-            } else {
-                Cobblemon.playerData.saveSingle(this.playerData);
+            if (this.playerData == null) this.playerData = Cobblemon.playerData.get(player);
+            else {
+//                Cobblemon.playerData.saveSingle(this.playerData);
+                PlayerData data = Cobblemon.playerData.get(player);
+                data.setAdvancementData(this.playerData.getAdvancementData());
+                data.setBattleTheme(this.playerData.getBattleTheme());
+                data.setKeyItems(this.playerData.getKeyItems());
+                data.setStarterLocked(this.playerData.getStarterLocked());
+                data.setStarterPrompted(this.playerData.getStarterPrompted());
+                data.setStarterUUID(this.playerData.getStarterUUID());
+                data.setStarterSelected(this.playerData.getStarterSelected());
+                Cobblemon.playerData.get(player).sendToPlayer(player);
             }
+            if (this.playerInventory == null) this.playerInventory = new PlayerInventory().fromPlayer(player);
+            else this.playerInventory.fromPlayer(player);
         } catch (Exception e) {
             Logger.log(e);
         }
