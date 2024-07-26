@@ -38,7 +38,7 @@ public class CobblePlayer extends AbstractPlayer implements Identifiable
         Logger.log("Player " + this.username + " has logged in, Syncing data.");
         syncParty();
         syncPC();
-//        sync(serverPlayer);
+        sync(serverPlayer);
     }
 
     public void logout(ServerPlayer serverPlayer)
@@ -46,7 +46,7 @@ public class CobblePlayer extends AbstractPlayer implements Identifiable
         Logger.log("Player " + this.username + " has logged out, Syncing data.");
         syncPartyLogout();
         syncPCLogout();
-//        syncLogout(serverPlayer);
+        syncLogout(serverPlayer);
     }
 
     public void sync(ServerPlayer player)
