@@ -54,7 +54,7 @@ public class PlayerStorage
     }
 
     public void savePlayer(CobblePlayer player) {
-        storage.save(player);
+        saveAndRemovePlayer(player.getUuid());
     }
 
     public void saveAllPlayers()

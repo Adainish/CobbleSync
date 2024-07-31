@@ -25,6 +25,7 @@ public class PlayerListener
             CobblePlayer player = CobbleSync.instance.syncManager.loadPlayer(uuid, username);
 
             if (player == null) {
+                Logger.log("Player not found. Creating new player data for " + username + uuid + "...");
                 player = new CobblePlayer(event.getPlayer().getUUID());
                 player.setUsername(username);
                 CobbleSync.instance.syncManager.loadPlayer(uuid, username);
@@ -41,7 +42,8 @@ public class PlayerListener
             CobblePlayer player = CobbleSync.instance.syncManager.loadPlayer(event.getPlayer().getUUID(), event.getPlayer().getName().getString());
             if (player != null) {
                 player.logout(event.getPlayer());
-                CobbleSync.instance.syncManager.savePlayer(event.getPlayer().getUUID());
+                //store player to cache
+                CobbleSync.instance.syncManager.saveAndRemovePlayer(player);
             } else Logger.log("Player not found. Cannot save player data.");
             return Unit.INSTANCE;
         });

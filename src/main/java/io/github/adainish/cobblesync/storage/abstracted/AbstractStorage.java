@@ -47,6 +47,10 @@ public abstract class AbstractStorage<T> {
 
     public abstract void saveAndRemove(UUID uuid);
 
+    public abstract void saveAndRemove(T item);
+
+    public abstract void putCached(UUID uuid, T item);
+
     public abstract void saveAll();
 
     public abstract void load(UUID uuid);

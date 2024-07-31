@@ -1,5 +1,6 @@
 package io.github.adainish.cobblesync.sync;
 
+import io.github.adainish.cobblesync.logging.Logger;
 import io.github.adainish.cobblesync.storage.PlayerStorage;
 import io.github.adainish.cobblesync.sync.obj.CobblePlayer;
 
@@ -31,6 +32,24 @@ public class SyncManager
         if (this.playerStorage != null)
         {
             this.playerStorage.savePlayer(uuid);
+        }
+    }
+
+    public void saveAndRemovePlayer(CobblePlayer player)
+    {
+        if (this.playerStorage != null)
+        {
+            this.playerStorage.storage.save(player);
+            //remove from cache
+            this.playerStorage.storage.cachedUUIDMappedData.remove(player.getUuid());
+        } else Logger.log("PlayerStorage is null. Cannot save player data.");
+    }
+
+    public void saveAndRemovePlayer(UUID uuid)
+    {
+        if (this.playerStorage != null)
+        {
+            this.playerStorage.saveAndRemovePlayer(uuid);
         }
     }
 

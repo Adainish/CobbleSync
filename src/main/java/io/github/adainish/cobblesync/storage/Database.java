@@ -45,9 +45,9 @@ public class Database<T> extends AbstractStorage<T> {
     @Override
     public Optional<T> get(UUID uuid) {
         load(uuid);
-        if (cachedUUIDMappedData.containsKey(uuid))
+        if (cachedUUIDMappedData.containsKey(uuid)) {
             return Optional.of(cachedUUIDMappedData.get(uuid));
-
+        }
         Document document = getCollection().find(Filters.eq("uuid", uuid.toString())).first();
         if (document == null) {
             return Optional.empty();
@@ -95,7 +95,7 @@ public class Database<T> extends AbstractStorage<T> {
                 String uuid = identifiable.getUuid().toString();
                 Document document = Document.parse(gson.toJson(item));
                 Logger.log("Saving " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
-                if ( getCollection().replaceOne(Filters.eq("uuid", uuid), document, new ReplaceOptions().upsert(true)).wasAcknowledged())
+                if (getCollection().replaceOne(Filters.eq("uuid", uuid), document, new ReplaceOptions().upsert(true)).wasAcknowledged())
                     Logger.log("Successfully saved " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
             }
         });
@@ -103,13 +103,26 @@ public class Database<T> extends AbstractStorage<T> {
 
     @Override
     public void saveAndRemove(UUID uuid) {
-        this.cachedUUIDMappedData.remove(uuid);
         save(get(uuid).orElseThrow());
+        this.cachedUUIDMappedData.remove(uuid);
+    }
+
+    @Override
+    public void saveAndRemove(T item) {
+        if (item instanceof Identifiable identifiable) {
+            save(item);
+            this.cachedUUIDMappedData.remove(identifiable.getUuid());
+        }
+    }
+
+    @Override
+    public void putCached(UUID uuid, T item) {
+        cachedUUIDMappedData.put(uuid, item);
     }
 
     @Override
     public void saveAll() {
-        for (T item : getAll()) save(item);
+        getAll().forEach(this::save);
     }
 
     @Override
