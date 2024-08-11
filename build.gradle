@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.5-SNAPSHOT'
     id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 version = project.mod_version
@@ -31,6 +32,10 @@ repositories {
         name = 'Sonatype 01 Snapshots'
         url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
+    maven {
+        name = "redis"
+        url = "https://mvnrepository.com/artifact/redis.clients/jedis"
+    }
 }
 
 dependencies {
@@ -46,8 +51,9 @@ dependencies {
     compileOnlyApi("net.kyori:adventure-platform-fabric:5.8.0")
     compileOnlyApi("net.kyori:adventure-text-minimessage:4.17.0")
     compileOnly 'net.luckperms:api:5.4'
-    }
-
+    implementation 'redis.clients:jedis:5.2.0-beta4'
+    shadow group: 'redis.clients', name: 'jedis', version: '5.2.0-beta4'
+}
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
@@ -83,6 +89,32 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 }
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    inputFile = tasks.shadowJar.archiveFile
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    //prevent manifest from being added to the jar
+    mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    zip64 true
+
+    //relocate jedis
+    relocate("redis.clients", "io.github.adainish.redis.clients")
+}
+
+
+build.dependsOn shadowJar
+
+
 
 jar {
     from("LICENSE") {

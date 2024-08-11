@@ -6,6 +6,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 
+import io.github.adainish.cobblesync.CobbleSync;
 import io.github.adainish.cobblesync.logging.Logger;
 import io.github.adainish.cobblesync.storage.abstracted.AbstractStorage;
 import io.github.adainish.cobblesync.storage.adapters.MongoCodecStringArray;
@@ -14,6 +15,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import redis.clients.jedis.Jedis;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -97,6 +99,16 @@ public class Database<T> extends AbstractStorage<T> {
                 Logger.log("Saving " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
                 if (getCollection().replaceOne(Filters.eq("uuid", uuid), document, new ReplaceOptions().upsert(true)).wasAcknowledged())
                     Logger.log("Successfully saved " + item.getClass().getSimpleName() + " with UUID: " + uuid + " to database." + " At time: " + System.currentTimeMillis());
+                //send redis update if redis isn't null in main class
+                if (CobbleSync.instance.jedisPool != null)
+                {
+                    try (Jedis jedis = CobbleSync.instance.jedisPool.getResource())
+                    {
+                        //publicise the uuid, status of safe, to the channel "playerStatusUpdates"
+                        jedis.publish("playerStatusUpdates", uuid + " safe");
+                    }
+
+                }
             }
         });
     }
